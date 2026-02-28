@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+bun.lock
+yarn.lock
+package-lock.json
+
+# Build outputs
+dist/
+build/
+*.zip
+.wxt/
+.output/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Storybook
+storybook-static/
+
+# OS files
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor directories and files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Playwright
+test-results/
+playwright/.auth/
+
+# TypeScript
+*.tsbuildinfo
+
+# Claude/AI assistant
+.claude/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-error.log
