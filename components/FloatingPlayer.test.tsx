@@ -150,6 +150,34 @@ describe('FloatingPlayer', () => {
     expect(screen.getByRole('button', { name: /pause/i })).toBeInTheDocument();
   });
 
+  it('shows text preview when ttsState is speaking', () => {
+    const longText = 'The quick brown fox jumps over the lazy dog near the river bank';
+    render(
+      <FloatingPlayer
+        onOpenReader={mockOnOpenReader}
+        isActive={true}
+        text={longText}
+        ttsState="speaking"
+      />,
+    );
+    // 63 chars → truncated to 60 + ellipsis
+    expect(
+      screen.getByText('The quick brown fox jumps over the lazy dog near the river b\u2026'),
+    ).toBeInTheDocument();
+  });
+
+  it('does not show text preview when ttsState is idle', () => {
+    render(
+      <FloatingPlayer
+        onOpenReader={mockOnOpenReader}
+        isActive={true}
+        text="Short text"
+        ttsState="idle"
+      />,
+    );
+    expect(screen.queryByText('Short text')).toBeNull();
+  });
+
   it('mousedown on Play button calls preventDefault (prevents selection collapse)', () => {
     render(
       <FloatingPlayer

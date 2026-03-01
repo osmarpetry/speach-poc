@@ -24,6 +24,10 @@ const chrome = {
       get: vi.fn().mockResolvedValue({}),
       set: vi.fn().mockResolvedValue(undefined),
     },
+    onChanged: {
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+    },
   },
   tabs: {
     sendMessage: vi.fn(),

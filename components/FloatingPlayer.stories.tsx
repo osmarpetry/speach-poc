@@ -24,3 +24,11 @@ export const Paused: Story = {
 export const Hidden: Story = {
   args: { isActive: false },
 };
+
+export const SpeakingWithPreview: Story = {
+  args: {
+    ttsState: 'speaking',
+    isActive: true,
+    text: 'The quick brown fox jumps over the lazy dog near the river bank',
+  },
+};

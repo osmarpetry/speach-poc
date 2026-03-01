@@ -88,54 +88,61 @@ export function FloatingPlayer({
 
   return (
     <div style={{ ...positionStyle, ...styles.player }}>
-      {ttsState === 'idle' && (
+      <div style={styles.buttons}>
+        {ttsState === 'idle' && (
+          <button
+            aria-label="Play"
+            style={styles.btn}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={handlePlay}
+          >
+            ▶
+          </button>
+        )}
+        {ttsState === 'speaking' && (
+          <button
+            aria-label="Pause"
+            style={styles.btn}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={handlePause}
+          >
+            ⏸
+          </button>
+        )}
+        {ttsState === 'paused' && (
+          <button
+            aria-label="Resume"
+            style={styles.btn}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={handleResume}
+          >
+            ▶
+          </button>
+        )}
+        {ttsState !== 'idle' && (
+          <button
+            aria-label="Stop"
+            style={styles.btn}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={handleStop}
+          >
+            ⏹
+          </button>
+        )}
         <button
-          aria-label="Play"
-          style={styles.btn}
+          aria-label="Open Reader"
+          style={{ ...styles.btn, ...styles.readerBtn }}
           onMouseDown={(e) => e.preventDefault()}
-          onClick={handlePlay}
+          onClick={handleReader}
         >
-          ▶
+          📖
         </button>
+      </div>
+      {ttsState !== 'idle' && text && (
+        <div style={styles.preview}>
+          {text.length > 60 ? text.slice(0, 60) + '\u2026' : text}
+        </div>
       )}
-      {ttsState === 'speaking' && (
-        <button
-          aria-label="Pause"
-          style={styles.btn}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={handlePause}
-        >
-          ⏸
-        </button>
-      )}
-      {ttsState === 'paused' && (
-        <button
-          aria-label="Resume"
-          style={styles.btn}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={handleResume}
-        >
-          ▶
-        </button>
-      )}
-      {ttsState !== 'idle' && (
-        <button
-          aria-label="Stop"
-          style={styles.btn}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={handleStop}
-        >
-          ⏹
-        </button>
-      )}
-      <button
-        aria-label="Open Reader"
-        style={{ ...styles.btn, ...styles.readerBtn }}
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={handleReader}
-      >
-        📖
-      </button>
     </div>
   );
 }
@@ -143,13 +150,27 @@ export function FloatingPlayer({
 const styles: Record<string, React.CSSProperties> = {
   player: {
     display: 'flex',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'stretch',
     gap: 4,
     background: '#1a1a1a',
     borderRadius: 8,
     padding: '6px 8px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
     userSelect: 'none',
+  },
+  buttons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+  },
+  preview: {
+    fontSize: 11,
+    color: '#aaa',
+    maxWidth: 280,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   btn: {
     background: 'transparent',

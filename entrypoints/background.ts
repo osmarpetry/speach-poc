@@ -61,6 +61,7 @@ export default defineBackground({
                 readerArticle: {
                   html: message.html,
                   url: message.url,
+                  sourceLang: message.sourceLang ?? 'en',
                   timestamp: Date.now(),
                 },
               });
@@ -78,5 +79,15 @@ export default defineBackground({
         return false;
       },
     );
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync') return;
+      if (!('lang' in changes) && !('rate' in changes)) return;
+      if (activeTTSTabId !== null) {
+        stop();
+        broadcast('idle');
+        activeTTSTabId = null;
+      }
+    });
   },
 });

@@ -5,7 +5,7 @@ export type ExtensionMessage =
   | { type: 'TTS_PAUSE' }
   | { type: 'TTS_RESUME' }
   | { type: 'TTS_STOP' }
-  | { type: 'OPEN_READER'; html: string; url: string }
+  | { type: 'OPEN_READER'; html: string; url: string; sourceLang?: string }
   | { type: 'TTS_STATE_UPDATE'; state: TTSState };
 
 export function sendToBackground(message: ExtensionMessage): void {

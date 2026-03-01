@@ -11,19 +11,23 @@ const LANGUAGES = [
 export default function App() {
   const [lang, setLang] = useState('en-US');
   const [rate, setRate] = useState(1.0);
+  const [bionicEnabled, setBionicEnabled] = useState(false);
+  const [bionicFixation, setBionicFixation] = useState(0.4);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     chrome.storage.sync
-      .get(['lang', 'rate'])
+      .get(['lang', 'rate', 'bionicEnabled', 'bionicFixation'])
       .then((s) => {
         if (s['lang']) setLang(s['lang'] as string);
         if (s['rate']) setRate(s['rate'] as number);
+        if (s['bionicEnabled'] !== undefined) setBionicEnabled(s['bionicEnabled'] as boolean);
+        if (s['bionicFixation'] !== undefined) setBionicFixation(s['bionicFixation'] as number);
       });
   }, []);
 
   const handleSave = () => {
-    chrome.storage.sync.set({ lang, rate }).then(() => {
+    chrome.storage.sync.set({ lang, rate, bionicEnabled, bionicFixation }).then(() => {
       setSaved(true);
       setTimeout(() => setSaved(false), 1500);
     });
@@ -72,6 +76,41 @@ export default function App() {
         </div>
       </div>
 
+      <div style={styles.field}>
+        <label style={{ ...styles.label, ...styles.checkboxLabel }}>
+          <input
+            type="checkbox"
+            checked={bionicEnabled}
+            onChange={(e) => setBionicEnabled(e.target.checked)}
+            aria-label="Bionic Reading"
+          />
+          Bionic Reading
+        </label>
+      </div>
+
+      {bionicEnabled && (
+        <div style={styles.field}>
+          <label htmlFor="fixation-slider" style={styles.label}>
+            Fixation: {bionicFixation.toFixed(1)}
+          </label>
+          <input
+            id="fixation-slider"
+            type="range"
+            min="0.2"
+            max="0.6"
+            step="0.1"
+            value={bionicFixation}
+            onChange={(e) => setBionicFixation(parseFloat(e.target.value))}
+            style={styles.slider}
+            aria-label="Fixation"
+          />
+          <div style={styles.sliderLabels}>
+            <span>0.2</span>
+            <span>0.6</span>
+          </div>
+        </div>
+      )}
+
       <button onClick={handleSave} style={styles.button}>
         {saved ? 'Saved!' : 'Save Settings'}
       </button>
@@ -111,6 +150,12 @@ const styles: Record<string, React.CSSProperties> = {
   },
   slider: {
     width: '100%',
+    cursor: 'pointer',
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
     cursor: 'pointer',
   },
   sliderLabels: {

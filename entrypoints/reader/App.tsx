@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { sendToBackground } from '../../utils/messages';
+import { translate } from '../../utils/translate';
 import type { TTSState } from '../../utils/messages';
 
 interface ReaderArticle {
   html: string;
   url: string;
+  sourceLang?: string;
   timestamp: number;
 }
 
@@ -22,11 +24,16 @@ export default function App() {
   const [lang, setLang] = useState('en-US');
   const [rate, setRate] = useState(1.0);
   const [loading, setLoading] = useState(true);
+  const [sourceLang, setSourceLang] = useState('en');
+  const [translating, setTranslating] = useState(false);
 
   useEffect(() => {
     chrome.storage.session.get(['readerArticle']).then((s) => {
       const data = s['readerArticle'] as ReaderArticle | undefined;
-      if (data) setArticle(data);
+      if (data) {
+        setArticle(data);
+        setSourceLang(data.sourceLang ?? 'en');
+      }
       setLoading(false);
     });
 
@@ -35,14 +42,26 @@ export default function App() {
       if (s['rate']) setRate(s['rate'] as number);
     });
 
-    const listener = (message: unknown) => {
+    const messageListener = (message: unknown) => {
       const msg = message as { type: string; state?: TTSState };
       if (msg.type === 'TTS_STATE_UPDATE' && msg.state) {
         setTtsState(msg.state);
       }
     };
-    chrome.runtime.onMessage.addListener(listener);
-    return () => chrome.runtime.onMessage.removeListener(listener);
+    chrome.runtime.onMessage.addListener(messageListener);
+
+    const storageListener = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
+      if (area !== 'sync') return;
+      if (changes['lang']) setLang(changes['lang'].newValue as string);
+      if (changes['rate']) setRate(changes['rate'].newValue as number);
+      if (changes['lang'] ?? changes['rate']) setTtsState('idle');
+    };
+    chrome.storage.onChanged.addListener(storageListener);
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+      chrome.storage.onChanged.removeListener(storageListener);
+    };
   }, []);
 
   const handlePlay = () => {
@@ -60,6 +79,23 @@ export default function App() {
   const handleStop = () => {
     setTtsState('idle');
     sendToBackground({ type: 'TTS_STOP' });
+  };
+
+  const handleParagraphClick = async (e: React.MouseEvent<HTMLElement>) => {
+    const target = e.target as HTMLElement;
+    const para = target.closest('p, h1, h2, h3, h4, h5, h6, li');
+    if (!para || translating) return;
+    const text = para.textContent?.trim() ?? '';
+    if (!text) return;
+    setTranslating(true);
+    try {
+      const translated = await translate(text, sourceLang, lang);
+      sendToBackground({ type: 'TTS_SPEAK', text: translated });
+    } catch {
+      // silently fail
+    } finally {
+      setTranslating(false);
+    }
   };
 
   if (loading) {
@@ -130,6 +166,8 @@ export default function App() {
             style={styles.slider}
           />
 
+          {translating && <span style={styles.label}>Translating…</span>}
+
           <a
             href={article.url}
             target="_blank"
@@ -142,8 +180,9 @@ export default function App() {
       </div>
 
       <article
-        style={styles.article}
+        style={{ ...styles.article, cursor: translating ? 'wait' : 'pointer' }}
         dangerouslySetInnerHTML={{ __html: article.html }}
+        onClick={handleParagraphClick}
       />
     </div>
   );

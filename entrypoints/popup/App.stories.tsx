@@ -34,3 +34,25 @@ export const WithSavedSettings: Story = {
     },
   ],
 };
+
+export const BionicEnabled: Story = {
+  decorators: [
+    (Story) => {
+      const win = window as unknown as Record<string, unknown>;
+      win['chrome'] = {
+        ...(win['chrome'] as Record<string, unknown>),
+        storage: {
+          sync: {
+            get: async () => ({ bionicEnabled: true, bionicFixation: 0.4, lang: 'en-US', rate: 1.0 }),
+            set: async () => {},
+          },
+          session: {
+            get: async () => ({}),
+            set: async () => {},
+          },
+        },
+      };
+      return React.createElement(Story);
+    },
+  ],
+};
