@@ -22,7 +22,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
+    "@eslint/js": "^10.0.1",
     "@types/chrome": "^0.0.268",
     "@types/mozilla__readability": "^0.4.2",
     "@types/react": "^18.3.1",
