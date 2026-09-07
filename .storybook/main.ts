@@ -5,7 +5,6 @@ const config: StorybookConfig = {
     '../components/**/*.stories.tsx',
     '../entrypoints/**/*.stories.tsx',
   ],
-  addons: ['@storybook/addon-essentials'],
   framework: { name: '@storybook/react-vite', options: {} },
 };
 
